@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import client from './client'
-import { ApolloProvider } from 'react-apollo'
-import { Query } from 'react-apollo'
-import { ME, SEARCH_REPOSITORIES } from './graphql'
+import { ApolloProvider, Mutation, Query } from 'react-apollo'
+import { ME, SEARCH_REPOSITORIES, ADD_STAR } from './graphql'
 import { List, Typography, Input, Layout, Menu, Breadcrumb, Spin, Button, Icon } from 'antd';
 import './App.css';
 
@@ -14,11 +13,26 @@ const StarButton = props => {
   const node = props.node
   const totalCount = node.stargazers.totalCount
   const viewerHasStarred = node.viewerHasStarred
-  return (
-    <Button>
+  const StartStatus = ({addStar}) => {
+    return (
+      <Button onClick={
+        () => {
+          addStar({
+            variables: { input: { starrableId: node.id }}
+          })
+        }
+      }>
       <Icon type="star" style={{ color: 'yellow' }} theme="filled"/>
-      {totalCount} | {viewerHasStarred? 'starred' : '-'}
-    </Button>
+        {totalCount} | {viewerHasStarred? 'starred' : '-'}
+      </Button>
+    )
+  }
+  return (
+    <Mutation mutation={ADD_STAR}>
+    {
+      addStar => <StartStatus addStar={addStar} />
+    }
+    </Mutation>
   )
 }
 
@@ -28,7 +42,7 @@ const VARIABLES = {
   after: null,
   last: null,
   before: null,
-  query: "swiftui"
+  query: "nuxt-media"
 }
 
 class App extends Component {
@@ -101,7 +115,7 @@ class App extends Component {
               }
             </Query>
             <form>
-              <Input value={query} onChange={this.handleChange} style={{ width: '30%' }}/>
+              <Input value={query} onChange={this.handleChange} style={{ width: '50%' }}/>
             </form>
             <Query
               query={SEARCH_REPOSITORIES}
@@ -120,9 +134,10 @@ class App extends Component {
                             const node = edge.node
 
                             return (
-                              <List.Item key={node.id}>
-                                <a href={node.url} target="_blank" rel="noopener noreferrer">{node.name}</a>
-                                &nbsp;
+                              <List.Item key={node.id} style={{ width: '50%' }}>
+                                <List.Item.Meta
+                                  title={<a href={node.url} target="_blank" rel="noopener noreferrer">{node.name}</a>}
+                                />
                                 <StarButton node={node}/>
                               </List.Item>
                             )
