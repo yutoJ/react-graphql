@@ -5,6 +5,7 @@ import { ME, SEARCH_REPOSITORIES, ADD_STAR, REMOVE_STAR } from './graphql'
 import { List, Typography, Input, Layout, Menu, Breadcrumb, Spin, Button, Icon } from 'antd';
 import './App.css';
 
+const Search = Input.Search;
 const { Header, Footer, Content } = Layout;
 
 const { Title } = Typography;
@@ -99,6 +100,13 @@ class App extends Component {
     })
   }
 
+  search(value) {
+    this.setState({
+      ...VARIABLES,
+      query: value
+    })
+  }
+
   goNext(search) {
     this.setState({
       first: PER_PAGE,
@@ -155,7 +163,14 @@ class App extends Component {
               }
             </Query>
             <form>
-              <Input value={query} onChange={this.handleChange} style={{ width: '50%' }}/>
+              {/* <Input value={query} onChange={this.handleChange} style={{ width: '50%' }}/> */}
+              <Search
+                placeholder="input search text"
+                enterButton="Search"
+                size="large"
+                style={{ width: '50%' }}
+                onSearch={value => this.search(value)}
+              />
             </form>
             <Query
               query={SEARCH_REPOSITORIES}
