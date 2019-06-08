@@ -216,7 +216,7 @@ class App extends Component {
               }
             </Query>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+          <Footer style={{ textAlign: 'center' }}>Git repo search ©2019 Created by yutoj</Footer>
         </Layout>
         </div>
       </ApolloProvider>
