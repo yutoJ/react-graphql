@@ -4,8 +4,9 @@ import { ApolloProvider } from 'react-apollo'
 import { Query } from 'react-apollo'
 import { ME, SEARCH_REPOSITORIES } from './graphql'
 
+const PER_PAGE = 10
 const VARIABLES = {
-  first: 10,
+  first: PER_PAGE,
   after: null,
   last: null,
   before: null,
@@ -23,6 +24,24 @@ class App extends Component {
     this.setState({
       ...VARIABLES,
       query: event.target.value
+    })
+  }
+
+  goNext(search) {
+    this.setState({
+      first: PER_PAGE,
+      after: search.pageInfo.endCursor,
+      last: null,
+      before: null
+    })
+  }
+
+  goPrevious(search) {
+    this.setState({
+      first: null,
+      after: null,
+      last: PER_PAGE,
+      before: search.pageInfo.startCursor
     })
   }
 
@@ -65,12 +84,34 @@ class App extends Component {
 
                         return (
                           <li key={node.id}>
-                            <a href={node.url} target="_blank">{node.name}</a>
+                            <a href={node.url} target="_blank" rel="noopener noreferrer">{node.name}</a>
                           </li>
                         )
                       })
                     }
                   </ul>
+                  {
+                    data.search.pageInfo.hasPreviousPage === true ?
+                      <button
+                        onClick={this.goPrevious.bind(this, data.search)}
+                      >
+                        Previous
+                      </button>
+                      :
+                      null
+                    
+                  }
+                  {
+                    data.search.pageInfo.hasNextPage === true ?
+                      <button
+                        onClick={this.goNext.bind(this, data.search)}
+                      >
+                        Next
+                      </button>
+                      :
+                      null
+                    
+                  }
                 </React.Fragment>
               )
             }
