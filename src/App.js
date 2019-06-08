@@ -16,12 +16,23 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = VARIABLES
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  handleChange(event) {
+    this.setState({
+      ...VARIABLES,
+      query: event.target.value
+    })
   }
 
   render() {
     const { query, first, last, before, after } = this.state
     return (
       <ApolloProvider client={client}>
+        <form>
+          <input value={query} onChange={this.handleChange} />
+        </form>
         <Query query={ME}>
           { 
             ({ loading, error, data }) => {
