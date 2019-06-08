@@ -11,11 +11,13 @@ const { Header, Footer, Content } = Layout;
 const { Title } = Typography;
 
 const StarButton = props => {
-  const totalCount = props.node.stargazers.totalCount
+  const node = props.node
+  const totalCount = node.stargazers.totalCount
+  const viewerHasStarred = node.viewerHasStarred
   return (
     <Button>
-      <Icon type="star" />
-      {totalCount}
+      <Icon type="star" style={{ color: 'yellow' }} theme="filled"/>
+      {totalCount} | {viewerHasStarred? 'starred' : '-'}
     </Button>
   )
 }
