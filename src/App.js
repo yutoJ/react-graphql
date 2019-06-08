@@ -39,7 +39,11 @@ class App extends Component {
               if (loading) return 'Loading...'
               if (error) return `Error! ${error.message}`
 
-              return <div>{data.user.name}</div>
+              return (
+                <React.Fragment>
+                  <h2>{data.user.name}</h2>
+                </React.Fragment>
+              )
             }
           }
         </Query>
@@ -52,7 +56,23 @@ class App extends Component {
               if (loading) return 'Loading...'
               if (error) return `Error! ${error.message}`
               console.log({data})
-              return <div></div>
+              return (
+                <React.Fragment>
+                  <ul>
+                    {
+                      data.search.edges.map(edge => {
+                        const node = edge.node
+
+                        return (
+                          <li key={node.id}>
+                            <a href={node.url} target="_blank">{node.name}</a>
+                          </li>
+                        )
+                      })
+                    }
+                  </ul>
+                </React.Fragment>
+              )
             }
           }
         </Query>
