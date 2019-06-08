@@ -3,6 +3,22 @@ import client from './client'
 import { ApolloProvider } from 'react-apollo'
 import { Query } from 'react-apollo'
 import { ME, SEARCH_REPOSITORIES } from './graphql'
+import { List, Typography, Input, Layout, Menu, Breadcrumb, Spin, Button, Icon } from 'antd';
+import './App.css';
+
+const { Header, Footer, Content } = Layout;
+
+const { Title } = Typography;
+
+const StarButton = props => {
+  const totalCount = props.node.stargazers.totalCount
+  return (
+    <Button>
+      <Icon type="star" />
+      {totalCount}
+    </Button>
+  )
+}
 
 const PER_PAGE = 10
 const VARIABLES = {
@@ -49,74 +65,103 @@ class App extends Component {
     const { query, first, last, before, after } = this.state
     return (
       <ApolloProvider client={client}>
-        <form>
-          <input value={query} onChange={this.handleChange} />
-        </form>
-        <Query query={ME}>
-          { 
-            ({ loading, error, data }) => {
-              if (loading) return 'Loading...'
-              if (error) return `Error! ${error.message}`
+        <div className="App">
+        <Layout className="layout">
+          <Header>
+            <div className="logo" />
+            <Menu
+              theme="dark"
+              mode="horizontal"
+              defaultSelectedKeys={['2']}
+              style={{ lineHeight: '64px' }}
+            >
+              <Menu.Item key="1">Home</Menu.Item>
+              <Menu.Item key="2">Search</Menu.Item>
+            </Menu>
+          </Header>
+          <Content style={{ padding: '0 50px' }}>
+            <Breadcrumb style={{ margin: '16px 0' }}>
+              <Breadcrumb.Item>Home</Breadcrumb.Item>
+              <Breadcrumb.Item>Search</Breadcrumb.Item>
+            </Breadcrumb>
+            <Query query={ME}>
+              { 
+                ({ loading, error, data }) => {
+                  if (loading) return <Spin size="large" />
+                  if (error) return `Error! ${error.message}`
 
-              return (
-                <React.Fragment>
-                  <h2>{data.user.name}</h2>
-                </React.Fragment>
-              )
-            }
-          }
-        </Query>
-        <Query
-          query={SEARCH_REPOSITORIES}
-          variables={{ query, first, last, before, after }}
-        >
-          { 
-            ({ loading, error, data }) => {
-              if (loading) return 'Loading...'
-              if (error) return `Error! ${error.message}`
-              console.log({data})
-              return (
-                <React.Fragment>
-                  <ul>
-                    {
-                      data.search.edges.map(edge => {
-                        const node = edge.node
+                  return (
+                    <React.Fragment>
+                      <Title>{data.user.name}</Title>
+                    </React.Fragment>
+                  )
+                }
+              }
+            </Query>
+            <form>
+              <Input value={query} onChange={this.handleChange} style={{ width: '30%' }}/>
+            </form>
+            <Query
+              query={SEARCH_REPOSITORIES}
+              variables={{ query, first, last, before, after }}
+            >
+              { 
+                ({ loading, error, data }) => {
+                  if (loading) return <Spin size="large" />
+                  if (error) return `Error! ${error.message}`
+                  console.log({data})
+                  return (
+                    <React.Fragment>
+                      <List>
+                        {
+                          data.search.edges.map(edge => {
+                            const node = edge.node
 
-                        return (
-                          <li key={node.id}>
-                            <a href={node.url} target="_blank" rel="noopener noreferrer">{node.name}</a>
-                          </li>
-                        )
-                      })
-                    }
-                  </ul>
-                  {
-                    data.search.pageInfo.hasPreviousPage === true ?
-                      <button
-                        onClick={this.goPrevious.bind(this, data.search)}
-                      >
-                        Previous
-                      </button>
-                      :
-                      null
-                    
-                  }
-                  {
-                    data.search.pageInfo.hasNextPage === true ?
-                      <button
-                        onClick={this.goNext.bind(this, data.search)}
-                      >
-                        Next
-                      </button>
-                      :
-                      null
-                    
-                  }
-                </React.Fragment>
-              )
-            }
-          }
-        </Query>
+                            return (
+                              <List.Item key={node.id}>
+                                <a href={node.url} target="_blank" rel="noopener noreferrer">{node.name}</a>
+                                &nbsp;
+                                <StarButton node={node}/>
+                              </List.Item>
+                            )
+                          })
+                        }
+                      </List>
+                      {
+                        data.search.pageInfo.hasPreviousPage === true ?
+                          <Button
+                            onClick={this.goPrevious.bind(this, data.search)}
+                            type="dashed"
+                          >
+                            <Icon type="left" />
+                            Previous
+                          </Button>
+                          :
+                          null
+                        
+                      }
+                      {
+                        data.search.pageInfo.hasNextPage === true ?
+                          <Button
+                            onClick={this.goNext.bind(this, data.search)}
+                            type="dashed"
+                          >
+                            Next
+                            <Icon type="right" />
+                          </Button>
+                          :
+                          null
+                        
+                      }
+                    </React.Fragment>
+                  )
+                }
+              }
+            </Query>
+          </Content>
+          <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+        </Layout>
+        </div>
       </ApolloProvider>
     )
   }
